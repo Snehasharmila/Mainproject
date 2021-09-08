@@ -1,0 +1,70 @@
+create database OnlineFoodOrderingDB;
+use OnlineFoodOrderingDB;
+
+create table Restaurants(RestaurantID int Auto_Increment primary key,RestaurantName varchar(20),RestaurantAddress varchar(20),RestaurantCity varchar(20),ContactNo bigint);
+insert into restaurants values(10,"BBQ","Junction road","Salem",7708980372);
+insert into restaurants values(11,"Annam","Omalur","Salem",9674351524);
+insert into restaurants values(12,"R.R","Five roads","Cbe",9952129199);
+insert into restaurants values(13,"A2B","Newbusstand","dpi",7496848615);
+insert into restaurants values(14,"Saravanas","Sozhinganallur","Chennai",9426759584);
+insert into restaurants values(15,"A.M","Palayamkottai","Tvl",9923429199);
+
+
+create table RMenuItems(MenuId int Auto_Increment Primary key,RestaurantID int,foreign key(restaurantID) references Restaurants(RestaurantID),MenuName varchar(20),MenuType varchar(20),MenuCategory varchar(20),MenuPrice int,MenuDesc varchar(20));
+insert into RMenuItems values(1,10,"Veg","Dessert","Dinner",90,"Vanilla Milkshake");
+insert into RMenuItems values(2,10,"Non-Veg","Gravy","Lunch",180,"Butter Chicken");
+insert into RMenuItems values(3,11,"Non-Veg","Naan","Dinner",100,"Parotta");
+insert into RMenuItems values(4,11,"Veg","French fries","Snacks",90,"Gobi 65");
+insert into RMenuItems values(5,12,"Veg","Dosa","Breakfast",60,"Onion roast");
+insert into RMenuItems values(6,13,"Non-Veg","Rice","Lunch",150,"Egg Fried Rice");
+insert into RMenuItems values(7,13,"Veg","Dessert","Dinner",30,"Gulab Jamun");
+insert into RMenuItems values(8,14,"Non-Veg","Noodles","Lunch",120,"Chicken Noodles");
+insert into RMenuItems values(9,15,"Veg","Starters","Snacks",50,"Sandwich");
+insert into RMenuItems values(10,15,"Veg","Dosa","Breakfast",75,"Egg Dosa");
+
+create table Customers(CustomerID varchar(20) Primary key,CustomerName varchar(20),CustomerCity varchar(10),CustomerGender varchar(1) check (CustomerGender in ('F','M','T')),CustomerPassword varchar(50));
+insert into customers values("sneha@gmail.com","Sneha","Salem",'F',MD5("Sneha"));
+insert into customers values("tamil@gmail.com","Tamil","Salem",'M',MD5("Tamil"));
+insert into customers values("ajii@gmail.com","Ajii","Chennai",'F',MD5("Ajii"));
+insert into customers values("anu@gmail.com","Anu","Hosur",'F',MD5("Anu"));
+insert into customers values("kayal@gmail.com","Kayal","Cbe",'F',MD5("Kayal"));
+
+create table Orders(OrderID int Auto_Increment Primary key,CustomerID varchar(20),foreign key(CustomerID) references Customers(CustomerID),OrderDate date,DeliveryAddress varchar(50),OrderStatus varchar(20) check(orderstatus in ("Delivered","Cancelled")));
+insert into orders values(101,"sneha@gmail.com",'2021-07-29',"R.K,Nagar Salem","Delivered");
+insert into orders values(102,"tamil@gmail.com",'2021-07-29',"ST Nagar Salem","Cancelled");
+insert into orders values(103,"ajii@gmail.com",'2021-04-12',"T.Nagar Chennai","Delivered");
+insert into orders values(104,"anu@gmail.com",'2021-04-12',"K.K.nagar Hosur","Delivered");
+insert into orders values(105,"kayal@gmail.com",'2021-01-09',"Cbe","Cancelled");
+
+create table OrderMenus(OrderID int,foreign key(OrderID) references Orders(OrderID),MenuID int ,foreign key(MenuID) references RMenuItems(MenuID),MenuQty int,MenuPrice int);
+insert into OrderMenus values(101,2,1,180);
+insert into OrderMenus values(102,1,2,180);
+insert into OrderMenus values(104,10,1,75);
+insert into OrderMenus values(103,6,1,150);
+insert into OrderMenus values(105,6,1,150);
+
+Reports / Queries
+
+1. Show the list of Restaurant of specific city
+
+select * from Restaurants where RestaurantCity="Salem";
+
+2. Show the list of all Restaurants along with menus (RestaurantID , RestaurantName ,MenuID , MenuName , MenuPrice)
+
+select a.RestaurantID,a.RestaurantName,b.MenuID,b.MenuName,b.MenuPrice from Restaurants a,RMenuItems b where a.RestaurantID=b.RestaurantID;
+
+3. Show the list of  Restaurants along with menus (RestaurantID , RestaurantName ,MenuID , MenuName , MenuPrice) of specific city
+
+select a.RestaurantID,a.RestaurantName,b.MenuID,b.MenuName,b.MenuPrice from Restaurants a,RMenuItems b where a.RestaurantID=b.RestaurantID and RestaurantCity="Chennai";
+
+4. Show the list of Orders of a specific customer
+
+select a.CustomerName,a.CustomerID,a.CustomerCity,b.OrderID,b.OrderDate,b.OrderStatus,c.MenuQty,c.MenuPrice from Customers a,Orders b,OrderMenus c where a.CustomerID=b.CustomerID and b.OrderID=c.OrderID and CustomerName="Dhanam";
+
+5. Show the list of orders along with ordermenus of a specific customer
+
+select a.CustomerName,a.CustomerID,b.OrderDate,b.OrderStatus,c.MenuQty,c.MenuPrice,d1.RestaurantName,d.MenuName,d.MenuType,d.MenuCategory,d.MenuDesc from Customers a,Orders b,OrderMenus c ,RMenuItems d,Restaurants d1 where a.CustomerID=b.CustomerID and b.OrderID=c.OrderID and c.MenuId=d.MenuID and d1.RestaurantID=d.RestaurantID and CustomerName="Dhanam";
+
+6. Show the list of latest 5 orders of a specific customer
+
+select a.CustomerName,a.CustomerID,a.CustomerCity,b.OrderID,b.OrderDate,b.OrderStatus,c.MenuQty,c.MenuPrice from Customers a,Orders b,OrderMenus c where a.CustomerID=b.CustomerID and b.OrderID=c.OrderID and CustomerName="Dhanam" order by OrderDate desc limit 5;

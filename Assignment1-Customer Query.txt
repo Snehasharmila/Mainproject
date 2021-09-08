@@ -1,0 +1,70 @@
+create database Customerdb;
+use customerdb;
+
+create table Customer(CustomerID int AUTO_INCREMENT primary key,CustomerName varchar(20),CustomerCity varchar(20),CustomerAddress varchar(50),CustomerMobileNo bigint unique,PAN varchar(20) unique,CustomerPassword varchar(20)) AUTO_INCREMENT=100;
+insert into customer values(11,"Sneha","Salem","R.K.nagar",9994432987,"ADEKV2325K",MD5("Sneha"));
+insert into customer values(12,"Anu","Hosur","K.K Nagar",7708956789,"RDKSH7826K",MD5("Anu"));
+insert into customer values(13,"Laser","Dpi","Thoppur",9812309465,"ETKFN9812M",MD5("Laser"));
+insert into customer values(14,"Ajii","Chennai","Thirumal Nagar",9489970918,"SKENK9489I",MD5("Ajii"));
+insert into customer values(15,"Ju","Madurai","VP Nagar",9476670818,"RTPVV9476Y",MD5("Ju"));
+insert into customer values(16,"Kayal","Ooty","VOC Nagar",9414367595,"QWNCK9414Y",MD5("Kayal"));
+insert into customer values(17,"Ishu","Madurai","Ktc Nagar",9942440918,"PSFPS9942L",MD5("Ishu"));
+insert into customer values(18,"Tamil","Coimbatore","JP Nagar",9952129191,"CMDNDP9952P",MD5("Tamil"));
+insert into customer values(19,"Vicky","Salem","Newbusstand",9384321369,"QSLDWP9384U",MD5("Vicky"));
+insert into customer values(20,"Kaviya","Chennai","Chrompet",9994282220,"DSKDH9994U",MD5("Kaviya"));
+
+create table AccountInfo(AccountID bigint AUTO_INCREMENT primary key,CustomerID int,foreign key(CustomerID) references  CustomerInfo(CustomerID),AccountType varchar(20),AccountBalance bigint,AccountOpenDate date,AccountStatus Varchar(10) not null CHECK(AccountStatus in ('Open','Closed','Blocked')));
+insert into AccountInfo values(780,11,"Salary Account",200000,'2021-01-09',"Open");
+insert into AccountInfo values(781,12,"Savings Account",15000,'2021-01-09',"Closed");
+insert into AccountInfo values(782,13,"Current Account",250000,'2021-01-09',"open");
+insert into AccountInfo values(783,14,"Salary Account",50000,'2020-05-10',"open");
+insert into AccountInfo values(784,15,"Savings Account",40000,'2019-01-12',"open");
+insert into AccountInfo values(785,16,"Salary Account",200000,'2020-05-12',"Closed");
+insert into AccountInfo values(786,17,"Current Account",100000,'2020-05-12',"Open");
+insert into AccountInfo values(787,18,"Salary Account",300000,'2018-03-20',"Open");
+insert into AccountInfo values(788,19,"Savings Account",30000,'2021-03-20',"Open");
+insert into AccountInfo values(789,20,"Current Account",35000,'2021-08-22',"Closed");
+
+
+create table TransactionInfo(TransactionID int AUTO_INCREMENT primary key,AccountID bigint,foreign key(AccountID) references AccountInfo(AccountID),TransactionType varchar(20) default 'Not Done',Amount bigint check(Amount>0),TransactionDate date);
+insert into TransactionInfo values(110,780,"Debit",2000,'2021-05-09');
+insert into TransactionInfo values(111,782,"Credit",1000,'2021-04-19');
+insert into TransactionInfo values(112,783,"Credit",1550,'2021-03-22');
+insert into TransactionInfo values(113,784,"Debit",800,'2021-02-09');
+insert into TransactionInfo values(114,785,"Debit",1010,'2021-01-20');
+insert into TransactionInfo values(115,786,"Credit",1015,'2021-08-20');
+insert into TransactionInfo values(116,787,"Debit",10000,'2021-05-20');
+insert into TransactionInfo values(117,788,"Credit",1000,'2021-06-20');
+insert into TransactionInfo values(118,789,"Debit",12000,'2021-08-20');
+insert into TransactionInfo values(119,789,"Credit",22000,'2021-10-20');
+insert into TransactionInfo values(120,789,"Debit",2500,'2021-11-20');
+insert into TransactionInfo values(121,783,"Credit",1550,'2021-05-30');
+insert into TransactionInfo values(122,787,"Credit",1550,'2021-05-30');
+insert into TransactionInfo values(123,781,"Credit",25000,'2021-06-20');
+insert into TransactionInfo values(124,783,"Debit",1550,'2021-04-22');
+
+
+Reports
+1. Latest 5 transactions of an account (Enter Account ID as an Input).
+
+select * from TransactionInfo where AccountID=789 order by TransactionDate desc limit 5;
+
+2. Transaction between two dates of an account (Enter Account ID as an Input)
+
+select * from TransactionInfo where AccountID=789 and TransactionDate between '2021-09-01' and '2021-12-01';
+
+3. List of Accounts of a Customer (Enter Customer ID as an input)
+
+ select * from AccountInfo where CustomerID=19;
+
+4. List of customers(CustomerID,CustomerName,CustomerAddress,CustomerMobileNo, AccountID , AccountBalance).
+
+select a.CustomerID,a.CustomerName,a.CustomerAddress,a.CustomerMobileNo,b.AccountID,b.AccountBalance from CustomerInfo a,Accountinfo b where a.CustomerID=b.CustomerID;
+
+5. List of accounts with transactions (AccountID , AccountBalance , TransID , Amount, TransationType).
+
+select a.AccountID,a.AccountBalance,b.TransactionID,b.Amount,b.TransactionType from AccountInfo a,TransactionInfo b where a.AccountID=b.AccountID;
+
+6. List of customers with accounts and transations (CustomerID,CustomerName,CustomerAddress,CustomerMobileNo, AccountID , AccountBalance,TransationID , Amount, TransationType)
+
+select a.CustomerID,a.CustomerName,a.CustomerAddress,a.CustomerMobileNo,b.AccountID,b.AccountBalance,c.TransactionID,c.Amount,c.TransactionType from CustomerInfo a,AccountInfo b,TransactionInfo c where a.CustomerID=b.CustomerID and b.AccountID=c.AccountID;
